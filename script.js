@@ -2,6 +2,7 @@ const RSI_URL = "https://www.cryptowaves.app/api/rsi";
 
 // Store previous RSI states for comparison
 let previousRSIStates = {};
+let isFirstLoad = true; // Flag to indicate if it's the first data load
 
 // Fetch RSI data
 async function fetchRSIData() {
@@ -89,7 +90,10 @@ function updateRSICategories(data) {
       sellCount++;
 
       // Trigger notification if RSI crosses above 70
-      if (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] <= 70) {
+      if (
+        !isFirstLoad &&
+        (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] <= 70)
+      ) {
         sendRSINotification(coin, coin.rsi, "Overbought (Sell Opportunity)");
       }
     } else if (coin.rsi < 30) {
@@ -97,7 +101,10 @@ function updateRSICategories(data) {
       buyCount++;
 
       // Trigger notification if RSI crosses below 30
-      if (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] >= 30) {
+      if (
+        !isFirstLoad &&
+        (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] >= 30)
+      ) {
         sendRSINotification(coin, coin.rsi, "Oversold (Buy Opportunity)");
       }
     } else {
@@ -183,6 +190,8 @@ async function initDashboard() {
   const data = await fetchRSIData();
   updateRSICategories(data);
   initChart(data);
+
+  if (isFirstLoad) isFirstLoad = false;
 }
 
 // Request notification permissions on load
@@ -190,6 +199,5 @@ if ("Notification" in window) {
   Notification.requestPermission();
 }
 
-// Update the Dashboard every 30 seconds
-initDashboard(); // Initial load
-setInterval(initDashboard, 30000); // Refresh every 30 seconds
+initDashboard();
+setInterval(initDashboard, 30000);
