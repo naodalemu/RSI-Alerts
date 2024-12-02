@@ -23,6 +23,7 @@ main {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 40px;
+  margin-bottom: 10px;
 }
 
 .card-section {
@@ -62,6 +63,7 @@ main {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   height: 20px;
   overflow: hidden;
+  cursor: pointer;
   transition: height 0.3s ease-in-out;
 }
 
@@ -133,4 +135,8 @@ canvas {
   text-align: center;
   min-height: 20px;
   min-width: 10px;
+}
+
+.coin-name {
+  text-align: right;
 }

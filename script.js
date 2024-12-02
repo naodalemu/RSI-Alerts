@@ -44,7 +44,7 @@ function updateRSICategories(data) {
           </strong>
           <strong>$${coin.current_price.toFixed(6)}</strong>
         </div>
-        <div><span>[Name]</span><span>${coin.name}</span></div>
+        <div class="coin-name"><span>[Name]</span><span>${coin.name}</span></div>
         <div><span>[RSI (4h)]</span><span>${coin.rsi.toFixed(2)}</span></div>
         <div><span>[RSI (1d)]</span><span>${coin.rsi_1d.toFixed(2)}</span></div>
         <div><span>[1H]</span><span>${coin.change_1h.toFixed(2)}%</span></div>
