@@ -1,5 +1,8 @@
 const RSI_URL = "https://www.cryptowaves.app/api/rsi";
 
+// Store previous RSI states for comparison
+let previousRSIStates = {};
+
 // Fetch RSI data
 async function fetchRSIData() {
   try {
@@ -9,6 +12,33 @@ async function fetchRSIData() {
   } catch (error) {
     console.error(error);
     return [];
+  }
+}
+
+// Send RSI Notification
+function sendRSINotification(coin, rsi, type) {
+  const notificationTitle = `RSI Alert: ${type}`;
+  const notificationBody = `
+    Coin: ${coin.name} (${coin.coin})
+    RSI: ${rsi.toFixed(2)}
+    Current Price: $${coin.current_price.toFixed(2)}
+  `;
+
+  // Check if the browser supports notifications
+  if (!("Notification" in window)) {
+    alert(`${notificationTitle}\n${notificationBody}`);
+    return;
+  }
+
+  // Permission check for sending notifications
+  if (Notification.permission === "granted") {
+    new Notification(notificationTitle, { body: notificationBody });
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        new Notification(notificationTitle, { body: notificationBody });
+      }
+    });
   }
 }
 
@@ -44,7 +74,7 @@ function updateRSICategories(data) {
           </strong>
           <strong>$${coin.current_price.toFixed(6)}</strong>
         </div>
-        <div class="coin-name"><span>[Name]</span><span>${coin.name}</span></div>
+        <div><span>[Name]</span><span>${coin.name}</span></div>
         <div><span>[RSI (4h)]</span><span>${coin.rsi.toFixed(2)}</span></div>
         <div><span>[RSI (1d)]</span><span>${coin.rsi_1d.toFixed(2)}</span></div>
         <div><span>[1H]</span><span>${coin.change_1h.toFixed(2)}%</span></div>
@@ -57,13 +87,26 @@ function updateRSICategories(data) {
     if (coin.rsi > 70) {
       sellList.innerHTML += card;
       sellCount++;
+
+      // Trigger notification if RSI crosses above 70
+      if (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] <= 70) {
+        sendRSINotification(coin, coin.rsi, "Overbought (Sell Opportunity)");
+      }
     } else if (coin.rsi < 30) {
       buyList.innerHTML += card;
       buyCount++;
+
+      // Trigger notification if RSI crosses below 30
+      if (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] >= 30) {
+        sendRSINotification(coin, coin.rsi, "Oversold (Buy Opportunity)");
+      }
     } else {
       waitList.innerHTML += card;
       waitCount++;
     }
+
+    // Update previous RSI state
+    previousRSIStates[coin.coin] = coin.rsi;
   });
 
   // Update counters in the UI
@@ -135,34 +178,16 @@ function initChart(data) {
   });
 }
 
-// Notification Functionality
-function sendNotification(message) {
-  if (!("Notification" in window)) {
-    alert(message);
-    return;
-  }
-
-  if (Notification.permission === "granted") {
-    new Notification("RSI Alert", { body: message });
-  } else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        new Notification("RSI Alert", { body: message });
-      }
-    });
-  }
-}
-
-// Request Notification Permission on Page Load
-if ("Notification" in window) {
-  Notification.requestPermission();
-}
-
 // Initialize the Dashboard
 async function initDashboard() {
   const data = await fetchRSIData();
   updateRSICategories(data);
   initChart(data);
+}
+
+// Request notification permissions on load
+if ("Notification" in window) {
+  Notification.requestPermission();
 }
 
 // Update the Dashboard every 30 seconds

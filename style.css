@@ -140,3 +140,7 @@ canvas {
 .coin-name {
   text-align: right;
 }
+
+.bold {
+  font-weight: bold;
+}
