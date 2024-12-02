@@ -1,48 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+    rel="stylesheet">
   <title>RSI Analysis Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <header>
-    <h1>RSI Analysis Dashboard</h1>
+    <h2>RSI Analysis Dashboard</h2>
   </header>
 
   <main>
-    <section class="dashboard">
-      <!-- Buy Section -->
-      <div class="card-section">
-        <h2>Buy</h2>
-        <div id="buy-list" class="list"></div>
-      </div>
-
-      <!-- Wait Section -->
-      <div class="card-section">
-        <h2>Wait</h2>
-        <div id="wait-list" class="list"></div>
-      </div>
-
-      <!-- Sell Section -->
-      <div class="card-section">
-        <h2>Sell</h2>
-        <div id="sell-list" class="list"></div>
-      </div>
-    </section>
-
     <!-- RSI Chart -->
     <section class="chart">
       <h2>RSI Levels</h2>
       <canvas id="rsiChart"></canvas>
+    </section>
+
+    <section class="dashboard">
+      <!-- Buy Section -->
+      <div class="card-section">
+        <h2>Buy <span class="amount_of_buys"></span></h2>
+        <div class="list-scroller">
+          <div id="buy-list" class="list"></div>
+        </div>
+      </div>
+
+      <!-- Wait Section -->
+      <div class="card-section">
+        <h2>Wait <span class="amount_of_waits"></span></h2>
+        <div class="list-scroller">
+          <div id="wait-list" class="list"></div>
+        </div>
+      </div>
+
+      <!-- Sell Section -->
+      <div class="card-section">
+        <h2>Sell <span class="amount_of_sells"></span></h2>
+        <div class="list-scroller">
+          <div id="sell-list" class="list"></div>
+        </div>
+      </div>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
+
 </html>
