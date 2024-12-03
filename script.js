@@ -18,11 +18,10 @@ async function fetchRSIData() {
 
 // Send RSI Notification
 function sendRSINotification(coin, rsi, type) {
-  const notificationTitle = `RSI Alert: ${type}`;
+  const notificationTitle = `${coin.name}: ${type}`;
   const notificationBody = `
-    Coin: ${coin.name} (${coin.coin})
-    RSI: ${rsi.toFixed(2)}
-    Current Price: $${coin.current_price.toFixed(2)}
+RSI: ${rsi.toFixed(2)}
+Current Price: $${coin.current_price.toFixed(2)}
   `;
 
   // Check if the browser supports notifications
@@ -41,6 +40,38 @@ function sendRSINotification(coin, rsi, type) {
       }
     });
   }
+
+  const BOT_TOKEN = '7221843400:AAH0qmvO_z2N-Rq1CBQMP9KWaAzcpCxjFR0';
+  const CHAT_ID = ['926377214', '856048902'];
+  const MESSAGE = `${notificationTitle} ${notificationBody}`;
+
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+  // Use the Fetch API to send the message
+  CHAT_ID.forEach(id => {
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: id, // fenan nebere eziga
+        parse_mode: "HTML",
+        text: MESSAGE
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.ok) {
+        console.log('Message sent successfully:', data);
+      } else {
+        console.error('Error sending message:', data);
+      }
+    })
+    .catch(error => {
+      console.error('Network error:', error);
+    });
+  });
 }
 
 // Update RSI categories and counters
