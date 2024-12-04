@@ -1,8 +1,12 @@
 const RSI_URL = "https://www.cryptowaves.app/api/rsi";
 
-// Store previous RSI states for comparison
+// Store previous RSI states and last notification timestamps
 let previousRSIStates = {};
+let lastNotificationTimestamps = {};
 let isFirstLoad = true; // Flag to indicate if it's the first data load
+
+// Notification cooldown period (in milliseconds, e.g., 1 hour = 3600000 ms)
+const NOTIFICATION_COOLDOWN = 3600000;
 
 // Fetch RSI data
 async function fetchRSIData() {
@@ -18,11 +22,21 @@ async function fetchRSIData() {
 
 // Send RSI Notification
 function sendRSINotification(coin, rsi, type) {
-  const notificationTitle = `RSI Alert: ${type}`;
+  const now = Date.now();
+  const lastNotificationTime = lastNotificationTimestamps[coin.coin] || 0;
+
+  // Check if cooldown period has passed
+  if (now - lastNotificationTime < NOTIFICATION_COOLDOWN) {
+    console.log(`Notification suppressed for ${coin.coin} (cooldown active).`);
+    return;
+  }
+
+  const notificationTitle = `${type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"} ${coin.coin}: ${type}`;
   const notificationBody = `
-    Coin: ${coin.name} (${coin.coin})
-    RSI: ${rsi.toFixed(2)}
-    Current Price: $${coin.current_price.toFixed(2)}
+- RSI (4h): ${rsi.toFixed(2)}
+- Current Price: $${coin.current_price.toFixed(2)}
+
+Keep an eye on the market! ${type === "Overbought (Sell Opportunity)" ? "👎" : "🚀"}
   `;
 
   // Check if the browser supports notifications
@@ -41,6 +55,9 @@ function sendRSINotification(coin, rsi, type) {
       }
     });
   }
+
+  // Update the last notification timestamp
+  lastNotificationTimestamps[coin.coin] = now;
 }
 
 // Update RSI categories and counters
