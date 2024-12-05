@@ -67,7 +67,7 @@ main {
   transition: height 0.3s ease-in-out;
 }
 
-.card:hover {
+.card.expanded {
   height: auto;
   overflow: visible;
   transition: height 0.3s ease-in-out;

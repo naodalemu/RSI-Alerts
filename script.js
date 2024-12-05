@@ -137,6 +137,20 @@ function updateRSICategories(data) {
   buyCounter.textContent = `${buyCount}`;
   waitCounter.textContent = `${waitCount}`;
   sellCounter.textContent = `${sellCount}`;
+
+  // Re-attach event listeners to the newly created cards
+  attachCardClickListeners();
+}
+
+// Add click event listener to toggle card expansion
+function attachCardClickListeners() {
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      card.classList.toggle("expanded");
+    });
+  });
 }
 
 // Initialize the Chart
