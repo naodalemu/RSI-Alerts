@@ -36,7 +36,7 @@ function sendRSINotification(coin, rsi, type) {
   const notificationTitle = `${type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"} ${coin.coin}: ${type}`;
   const notificationBody = `
 - RSI (4h): ${rsi.toFixed(2)}
-- Current Price: $${coin.current_price.toFixed(2)}
+- Current Price: $${coin.current_price.toFixed(6)}
 
 Keep an eye on the market! ${type === "Overbought (Sell Opportunity)" ? "👎" : "🚀"}
   `;
