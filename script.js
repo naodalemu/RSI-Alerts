@@ -229,31 +229,6 @@ function updateChart(data) {
           },
         },
       },
-      plugins: {
-        afterDraw: (chart) => {
-          const ctx = chart.ctx;
-          const dataset = chart.data.datasets[0];
-          const meta = chart.getDatasetMeta(0);
-      
-          dataset.data.forEach((point, index) => {
-            const element = meta.data[index];
-            if (element) {
-              const { x, y } = element.getProps(["x", "y"], true);
-              const coinSymbol = point.details.coin;
-      
-              // Draw the coin symbol above each circle
-              ctx.save();
-              ctx.textAlign = "center";
-              ctx.textBaseline = "bottom";
-              ctx.font = "12px Arial"; // Adjust font size as needed
-              ctx.fillStyle = "black"; // Text color
-              ctx.fillText(coinSymbol, x, y - 10); // Position above the circle
-              ctx.restore();
-            }
-          });
-        },
-      },
-      
     },
   });
 }

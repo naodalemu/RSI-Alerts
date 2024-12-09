@@ -182,7 +182,13 @@ canvas {
   header {
     margin: 20px;
   }
+
+  canvas {
+    width: 100% !important; /* Adjust the width */
+    height: auto !important; /* Maintain height */
+  }
 }
+
 @media screen and (max-width: 426px) {
   .chart > h2 {
     display: none;
