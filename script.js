@@ -4,6 +4,8 @@ const RSI_URL = "https://www.cryptowaves.app/api/rsi";
 let previousRSIStates = {};
 let lastNotificationTimestamps = {};
 let isFirstLoad = true; // Flag to indicate if it's the first data load
+let currentRSIType = "4h"; // Default graph type
+let chartInstance = null; // Store the chart instance
 
 // Notification cooldown period (in milliseconds, e.g., 1 hour = 3600000 ms)
 const NOTIFICATION_COOLDOWN = 3600000;
@@ -154,27 +156,42 @@ function attachCardClickListeners() {
 }
 
 // Initialize the Chart
-function initChart(data) {
+function updateChart(data) {
   const ctx = document.getElementById("rsiChart").getContext("2d");
 
-  new Chart(ctx, {
+  const filteredData = data.map((coin) => ({
+    x: coin.rank,
+    y: currentRSIType === "4h" ? coin.rsi : coin.rsi_1d,
+    details: coin,
+  }));
+
+  const backgroundColors = data.map((coin) =>
+    currentRSIType === "4h"
+      ? coin.rsi > 70
+        ? "rgba(255, 99, 132, 0.7)" // Overbought (Red)
+        : coin.rsi < 30
+        ? "rgba(46, 232, 83, 0.7)" // Oversold (Green)
+        : "rgba(54, 162, 255, 0.7)" // Neutral (Blue)
+      : coin.rsi_1d > 70
+      ? "rgba(255, 99, 132, 0.7)" // Overbought (Red)
+      : coin.rsi_1d < 30
+      ? "rgba(46, 232, 83, 0.7)" // Oversold (Green)
+      : "rgba(54, 162, 255, 0.7)" // Neutral (Blue)
+  );
+
+  if (chartInstance) {
+    chartInstance.destroy(); // Destroy existing chart to render a new one
+  }
+
+  chartInstance = new Chart(ctx, {
     type: "scatter",
     data: {
       datasets: [
         {
-          label: "RSI Levels",
-          data: data.map((coin) => ({
-            x: coin.rank,
-            y: coin.rsi,
-            details: coin,
-          })),
-          backgroundColor: data.map((coin) =>
-            coin.rsi > 70
-              ? "rgba(255, 99, 132, 0.7)" // Overbought (Red)
-              : coin.rsi < 30
-              ? "rgba(46, 232, 83, 0.7)" // Oversold (Green)
-              : "rgba(54, 162, 255, 0.7)" // Neutral (Blue)
-          ),
+          label: `RSI Levels (${currentRSIType})`,
+          data: filteredData,
+          backgroundColor: backgroundColors,
+          radius: 4,
         },
       ],
     },
@@ -187,7 +204,7 @@ function initChart(data) {
               return [
                 `Name: ${coin.name} (${coin.coin})`,
                 `Rank: ${coin.rank}`,
-                `RSI: ${coin.rsi.toFixed(2)}`,
+                `RSI (${currentRSIType}): ${currentRSIType === "4h" ? coin.rsi.toFixed(2) : coin.rsi_1d.toFixed(2)}`,
                 `Price: $${coin.current_price.toFixed(2)}`,
                 `1H: ${coin.change_1h.toFixed(2)}%`,
                 `24H: ${coin.change_24h.toFixed(2)}%`,
@@ -208,19 +225,70 @@ function initChart(data) {
         y: {
           title: {
             display: true,
-            text: "RSI",
+            text: `RSI (${currentRSIType})`,
           },
         },
       },
+      plugins: {
+        afterDraw: (chart) => {
+          const ctx = chart.ctx;
+          const dataset = chart.data.datasets[0];
+          const meta = chart.getDatasetMeta(0);
+      
+          dataset.data.forEach((point, index) => {
+            const element = meta.data[index];
+            if (element) {
+              const { x, y } = element.getProps(["x", "y"], true);
+              const coinSymbol = point.details.coin;
+      
+              // Draw the coin symbol above each circle
+              ctx.save();
+              ctx.textAlign = "center";
+              ctx.textBaseline = "bottom";
+              ctx.font = "12px Arial"; // Adjust font size as needed
+              ctx.fillStyle = "black"; // Text color
+              ctx.fillText(coinSymbol, x, y - 10); // Position above the circle
+              ctx.restore();
+            }
+          });
+        },
+      },
+      
     },
   });
 }
+
+// Event listeners for the toggle buttons
+document.getElementById("rsi4hButton").addEventListener("click", () => {
+  currentRSIType = "4h";
+  document.getElementById("rsi4hButton").classList.add("active");
+  document.getElementById("rsi1dButton").classList.remove("active");
+  fetchRSIData().then(updateChart);
+});
+
+document.getElementById("rsi1dButton").addEventListener("click", () => {
+  currentRSIType = "1d";
+  document.getElementById("rsi1dButton").classList.add("active");
+  document.getElementById("rsi4hButton").classList.remove("active");
+  fetchRSIData().then(updateChart);
+});
+
+// Add click event listener to toggle card expansion
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = document.querySelectorAll(".card");
+  
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      card.classList.toggle("expanded");
+    });
+  });
+});
 
 // Initialize the Dashboard
 async function initDashboard() {
   const data = await fetchRSIData();
   updateRSICategories(data);
-  initChart(data);
+  updateChart(data);
 
   if (isFirstLoad) isFirstLoad = false;
 }

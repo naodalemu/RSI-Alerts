@@ -145,6 +145,30 @@ canvas {
   font-weight: bold;
 }
 
+.toggle-buttons {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.toggle-buttons button {
+  background-color: #b7d5d4;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-buttons button.active {
+  background-color: #00695c;
+  color: #fff;
+}
+
+.toggle-buttons button:hover {
+  background-color: #80cbc4;
+}
+
 @media screen and (max-width: 768px) {
   .dashboard {
     grid-template-columns: repeat(1, 1fr);
@@ -160,10 +184,6 @@ canvas {
   }
 }
 @media screen and (max-width: 426px) {
-  .chart {
-    padding: 0px;
-  }
-
   .chart > h2 {
     display: none;
   }
