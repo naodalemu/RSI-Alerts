@@ -34,12 +34,12 @@ function sendRSINotification(coin, rsi, type, rsiType) {
   }
 
   // Adjust notification title based on RSI thresholds
-  const notificationTitle = `${rsi < 20 ? "⭐" : rsi > 80 ? "🔥" : type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"} ${coin.coin}: ${type}`;
+  const notificationTitle = `${rsi == null ? "🚫" : rsi < 20 ? "⭐" : rsi > 80 ? "🔥" : type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"} ${coin.coin}: ${rsi == null ? "No Data About This Coin" : type }`;
   const notificationBody = `
-- RSI (${rsiType}): ${rsi.toFixed(2)}
-- Current Price: $${coin.current_price.toFixed(6)}
+- RSI (${rsiType}): ${rsi ? rsi.toFixed(2) : "No RSI Value For This Coin!"}
+- Current Price: $${coin.current_price ? coin.current_price.toFixed(6) : null}
 
-${rsi < 20 ? "Strong Buy Signal! ⭐" : rsi > 80 ? "Extreme Overbought Signal! 🔥" : "Keep an eye on the market!"}
+${rsi == null ? "Something wrong about this coin 🚫" : rsi < 20 ? "Strong Buy Signal! ⭐" : rsi > 80 ? "Extreme Overbought Signal! 🔥" : "Keep an eye on the market!"}
   `;
 
   // Check if the browser supports notifications
@@ -89,19 +89,19 @@ function updateRSICategories(data) {
       <div class="card">
         <div class="card-head">
           <strong>
-            <img src="${coin.image}" alt="${coin.name}" width="20">
-            ${coin.coin}
-            <span class="coin-rank">#${coin.rank}</span>
+            <img src="${coin.image ? coin.image : null}" alt="${coin.name ? coin.name : null}" width="20">
+            ${coin.coin ? coin.coin : null}
+            <span class="coin-rank">#${coin.rank ? coin.rank : null}</span>
           </strong>
-          <strong>$${coin.current_price.toFixed(6)}</strong>
+          <strong>$${coin.current_price ? coin.current_price.toFixed(6) : null}</strong>
         </div>
-        <div><span>[Name]</span><span>${coin.name}</span></div>
-        <div><span>[RSI (4h)]</span><span>${coin.rsi.toFixed(2)}</span></div>
-        <div><span>[RSI (1d)]</span><span>${coin.rsi_1d.toFixed(2)}</span></div>
-        <div><span>[1H]</span><span>${coin.change_1h.toFixed(2)}%</span></div>
-        <div><span>[24H]</span><span>${coin.change_24h.toFixed(2)}%</span></div>
-        <div><span>[7D]</span><span>${coin.change_7d.toFixed(2)}%</span></div>
-        <div><span>[30D]</span><span>${coin.change_30d.toFixed(2)}%</span></div>
+        <div><span>[Name]</span><span>${coin.name ? coin.name : null}</span></div>
+        <div><span>[RSI (4h)]</span><span>${coin.rsi ? coin.rsi.toFixed(2) : null}</span></div>
+        <div><span>[RSI (1d)]</span><span>${coin.rsi_1d ? coin.rsi_1d.toFixed(2) : null}</span></div>
+        <div><span>[1H]</span><span>${coin.change_1h ? coin.change_1h.toFixed(2) : null}%</span></div>
+        <div><span>[24H]</span><span>${coin.change_24h ? coin.change_24h.toFixed(2) : null}%</span></div>
+        <div><span>[7D]</span><span>${coin.change_7d ? coin.change_7d.toFixed(2) : null}%</span></div>
+        <div><span>[30D]</span><span>${coin.change_30d ? coin.change_30d.toFixed(2) : null}%</span></div>
       </div>
     `;
 
