@@ -198,6 +198,7 @@ function updateChart(data) {
       ],
     },
     options: {
+      animation: false,
       plugins: {
         tooltip: {
           callbacks: {
