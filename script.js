@@ -23,7 +23,7 @@ async function fetchRSIData() {
 }
 
 // Send RSI Notification
-function sendRSINotification(coin, rsi, type) {
+function sendRSINotification(coin, rsi, type, rsiType) {
   const now = Date.now();
   const lastNotificationTime = lastNotificationTimestamps[coin.coin] || 0;
 
@@ -33,12 +33,17 @@ function sendRSINotification(coin, rsi, type) {
     return;
   }
 
-  const notificationTitle = `${type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"} ${coin.coin}: ${type}`;
+  // Adjust notification title based on RSI thresholds
+  const notificationTitle = `
+    ${rsi < 20 ? "⭐" : rsi > 80 ? "🔥" : type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"}
+    ${coin.coin}: ${type}
+  `;
+
   const notificationBody = `
-- RSI (4h): ${rsi.toFixed(2)}
+- RSI (${rsiType}): ${rsi.toFixed(2)}
 - Current Price: $${coin.current_price.toFixed(6)}
 
-Keep an eye on the market! ${type === "Overbought (Sell Opportunity)" ? "👎" : "🚀"}
+${rsi < 20 ? "Strong Buy Signal! ⭐" : rsi > 80 ? "Extreme Overbought Signal! 🔥" : "Keep an eye on the market!"}
   `;
 
   // Check if the browser supports notifications
@@ -108,27 +113,28 @@ function updateRSICategories(data) {
       sellList.innerHTML += card;
       sellCount++;
 
-      // Trigger notification if RSI crosses above 70
-      if (
-        !isFirstLoad &&
-        (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] <= 70)
-      ) {
-        sendRSINotification(coin, coin.rsi, "Overbought (Sell Opportunity)");
+      // Trigger notification for 4h RSI
+      if (!isFirstLoad && (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] <= 70)) {
+        sendRSINotification(coin, coin.rsi, "Overbought (Sell Opportunity)", "4h");
       }
     } else if (coin.rsi < 30) {
       buyList.innerHTML += card;
       buyCount++;
 
-      // Trigger notification if RSI crosses below 30
-      if (
-        !isFirstLoad &&
-        (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] >= 30)
-      ) {
-        sendRSINotification(coin, coin.rsi, "Oversold (Buy Opportunity)");
+      // Trigger notification for 4h RSI
+      if (!isFirstLoad && (!previousRSIStates[coin.coin] || previousRSIStates[coin.coin] >= 30)) {
+        sendRSINotification(coin, coin.rsi, "Oversold (Buy Opportunity)", "4h");
       }
     } else {
       waitList.innerHTML += card;
       waitCount++;
+    }
+
+    // Trigger notifications for 1D RSI and thresholds
+    if (coin.rsi_1d > 80) {
+      sendRSINotification(coin, coin.rsi_1d, "Extreme Overbought Signal (1D)", "1d");
+    } else if (coin.rsi_1d < 20) {
+      sendRSINotification(coin, coin.rsi_1d, "Strong Buy Signal (1D)", "1d");
     }
 
     // Update previous RSI state
