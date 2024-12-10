@@ -34,11 +34,7 @@ function sendRSINotification(coin, rsi, type, rsiType) {
   }
 
   // Adjust notification title based on RSI thresholds
-  const notificationTitle = `
-    ${rsi < 20 ? "⭐" : rsi > 80 ? "🔥" : type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"}
-    ${coin.coin}: ${type}
-  `;
-
+  const notificationTitle = `${rsi < 20 ? "⭐" : rsi > 80 ? "🔥" : type === "Overbought (Sell Opportunity)" ? "🔴" : "🟢"} ${coin.coin}: ${type}`;
   const notificationBody = `
 - RSI (${rsiType}): ${rsi.toFixed(2)}
 - Current Price: $${coin.current_price.toFixed(6)}
